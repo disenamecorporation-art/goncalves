@@ -1,0 +1,79 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@200;300;400;500;600&display=swap');
+
+@theme {
+  --color-gold: #b1965f;
+  --color-gold-light: #d4bc8d;
+  --color-gold-dark: #8e794b;
+  --color-dark: #414141;
+  --color-cream: #f9f7f2;
+  --font-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", ui-serif, Georgia, serif;
+}
+
+@layer base {
+  body {
+    @apply bg-white text-dark font-sans antialiased overflow-x-hidden;
+  }
+}
+
+@layer utilities {
+  .gold-gradient-text {
+    background: linear-gradient(135deg, #b1965f 0%, #d4bc8d 50%, #8e794b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .gold-gradient-bg {
+    background: linear-gradient(135deg, #b1965f 0%, #d4bc8d 50%, #8e794b 100%);
+  }
+  
+  .gold-border {
+    border-image: linear-gradient(to right, #b1965f, #d4bc8d, #b1965f) 1;
+  }
+
+  .text-luxury {
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+
+  .glass-gold {
+    background: rgba(177, 150, 95, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(177, 150, 95, 0.1);
+  }
+
+  .parallax-image {
+    will-change: transform;
+    transition: transform 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+  }
+
+  .shine-effect {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .shine-effect::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      45deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.1) 45%,
+      rgba(255, 255, 255, 0.5) 50%,
+      rgba(255, 255, 255, 0.1) 55%,
+      transparent 100%
+    );
+    transform: rotate(25deg);
+    animation: shine 4s infinite;
+  }
+
+  @keyframes shine {
+    0% { transform: translateX(-100%) rotate(25deg); }
+    100% { transform: translateX(100%) rotate(25deg); }
+  }
+}
