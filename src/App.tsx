@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   Search, 
@@ -24,7 +24,7 @@ const HERO_IMAGES = [
   "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=2000",
   "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&q=80&w=2000",
   "https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&q=80&w=2000",
-  "https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&q=80&w=2000"
+  "https://i.postimg.cc/L5P9h3Jr/MG-2128.jpg"
 ];
 
 export default function App() {
@@ -34,24 +34,54 @@ export default function App() {
 
   const GALLERY_PHOTOS = [
     {
-      url: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=2000",
-      title: "Jardines Reales",
-      desc: "Una ceremonia al aire libre rodeada de la majestuosidad de la naturaleza."
+      url: "https://i.postimg.cc/tJ6q7Nsm/20190902-211720.jpg",
+      title: "Festín Imperial",
+      desc: "Un buffet diseñado con estructuras doradas y detalles florales para una recepción inolvidable."
     },
     {
-      url: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&q=80&w=2000",
-      title: "Salas de Cristal",
-      desc: "La elegancia del cristal y la luz para banquetes que deslumbran los sentidos."
+      url: "https://i.postimg.cc/7hzHbn5s/20200529-070038.jpg",
+      title: "Arquitectura en Azúcar",
+      desc: "Nuestras tortas de múltiples niveles son el centro de atención y el símbolo de la dulzura eterna."
     },
     {
-      url: "https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&q=80&w=2000",
-      title: "Atardeceres Eternos",
-      desc: "Capturando la esencia del romance bajo el cielo teñido de oro."
+      url: "https://i.postimg.cc/prjWyJmq/20201015-184042.jpg",
+      title: "El Brillo de la Novia",
+      desc: "Capturando la esencia de la elegancia en cada rincón del salón."
     },
     {
-      url: "https://images.unsplash.com/photo-1520854221256-17451cc35dbe?auto=format&fit=crop&q=80&w=2000",
-      title: "Detalles Maestros",
-      desc: "Donde cada pequeño elemento es supervisado para la perfección absoluta."
+      url: "https://i.postimg.cc/L5P9h3Jr/MG-2128.jpg",
+      title: "Escenario de Gala",
+      desc: "Ambientación musical y técnica de primer nivel para una noche de celebración sin fin."
+    },
+    {
+      url: "https://i.postimg.cc/BbFStBjV/Whats-App-Image-2026-04-14-at-14-19-35.jpg",
+      title: "Bosque de Cristal",
+      desc: "Diseño floral inmersivo que transporta a los invitados a un mundo de fantasía."
+    },
+    {
+      url: "https://i.postimg.cc/8cvpsm73/Whats-App-Image-2026-04-14-at-15-00-22.jpg",
+      title: "Catering de Alta Gama",
+      desc: "Servicio impecable en espacios majestuosos, cuidando cada detalle de la experiencia gastronómica."
+    },
+    {
+      url: "https://i.postimg.cc/rs4VzND7/Whats-App-Image-2026-04-14-at-15-00-24.jpg",
+      title: "Preparación Real",
+      desc: "Momentos de serenidad y belleza antes del 'sí, acepto' en suites de lujo."
+    },
+    {
+      url: "https://i.postimg.cc/MHB6Xmck/Whats-App-Image-2026-04-14-at-15-50-01.jpg",
+      title: "Diseño Vanguardista",
+      desc: "Combinamos colores y texturas para crear ambientes únicos y memorables."
+    },
+    {
+      url: "https://i.postimg.cc/D0GvmPS9/Whats-App-Image-2026-04-14-at-15-50-01-(1).jpg",
+      title: "Momentos Dulces",
+      desc: "La alegría compartida en el corte de la torta, rodeados de flores y luz."
+    },
+    {
+      url: "https://i.postimg.cc/RhtSqL35/Whats-App-Image-2026-04-14-at-16-04-13.jpg",
+      title: "Esculturas de Hielo",
+      desc: "Acentos artísticos que elevan el nivel de sofisticación en la mesa de postres."
     }
   ];
 
@@ -97,14 +127,30 @@ export default function App() {
     }
   ];
 
-  const InputField = ({ label, type = "text", placeholder }: { label: string, type?: string, placeholder?: string }) => (
+  const handleWhatsAppSend = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const nombre = formData.get('nombre');
+    const email = formData.get('email');
+    const fecha = formData.get('fecha');
+    const ubicacion = formData.get('ubicacion');
+    const mensaje = formData.get('mensaje');
+    
+    const text = `Hola Decio Goncalves, me gustaría solicitar una reunión.\n\n*Nombre:* ${nombre}\n*Email:* ${email}\n*Fecha del Evento:* ${fecha}\n*Ubicación:* ${ubicacion}\n*Mensaje:* ${mensaje}`;
+    const encodedText = encodeURIComponent(text);
+    window.open(`https://wa.me/584125994286?text=${encodedText}`, '_blank');
+  };
+
+  const InputField = ({ label, name, type = "text", placeholder }: { label: string, name: string, type?: string, placeholder?: string }) => (
     <div className="space-y-3 group">
       <label className="text-[10px] uppercase tracking-[0.3em] text-dark/40 group-focus-within:text-gold transition-colors block font-bold">
         {label}
       </label>
       <input 
+        name={name}
         type={type}
         placeholder={placeholder}
+        required
         className="w-full bg-transparent border-b border-gold/20 py-4 font-serif text-xl focus:outline-none focus:border-gold transition-all duration-500 placeholder:text-dark/10"
       />
     </div>
@@ -546,7 +592,7 @@ export default function App() {
               </div>
 
               {/* Grid de miniaturas abajo */}
-              <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div className="mt-20 grid grid-cols-2 md:grid-cols-5 gap-6">
                  {GALLERY_PHOTOS.map((photo, idx) => (
                    <motion.div
                     key={idx}
@@ -607,29 +653,31 @@ export default function App() {
                <div className="lg:w-2/3 w-full bg-white relative">
                   <div className="absolute -top-10 -right-10 w-64 h-64 bg-gold/5 rounded-full blur-3xl" />
                   <div className="relative z-10 glass-card p-12 md:p-20 rounded-[60px] shadow-3xl ring-1 ring-gold/10">
-                     <form className="space-y-12" onSubmit={(e) => e.preventDefault()}>
+                     <form className="space-y-12" onSubmit={handleWhatsAppSend}>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                           <InputField label="Nombre Completo" placeholder="Escribe tu nombre..." />
-                           <InputField label="Dirección de Correo" type="email" placeholder="example@luxury.com" />
+                           <InputField name="nombre" label="Nombre Completo" placeholder="Escribe tu nombre..." />
+                           <InputField name="email" label="Dirección de Correo" type="email" placeholder="example@luxury.com" />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                           <InputField label="Fecha del Evento" placeholder="DD / MM / AA" />
-                           <InputField label="Ubicación Sugerida" placeholder="Caracas, Madrid, Roma..." />
+                           <InputField name="fecha" label="Fecha del Evento" placeholder="DD / MM / AA" />
+                           <InputField name="ubicacion" label="Ubicación Sugerida" placeholder="Caracas, Madrid, Roma..." />
                         </div>
                         <div className="space-y-3 group">
                            <label className="text-[10px] uppercase tracking-[0.3em] text-dark/40 group-focus-within:text-gold transition-colors block font-bold">
                              Mensaje Personal
                            </label>
                            <textarea 
+                             name="mensaje"
                              rows={4}
+                             required
                              placeholder="Cuéntanos tu visión..."
                              className="w-full bg-transparent border-b border-gold/20 py-4 font-serif text-xl focus:outline-none focus:border-gold transition-all duration-500 placeholder:text-dark/10 resize-none"
                            />
                         </div>
                         
                         <div className="pt-8">
-                           <button className="shine-effect w-full py-6 bg-gold text-white text-xs font-bold uppercase tracking-[0.5em] rounded-full shadow-gold-glow-lg transition-all duration-700 hover:scale-[1.02] active:scale-95">
-                             Enviar Solicitud de Reunión
+                           <button type="submit" className="shine-effect w-full py-6 bg-gold text-white text-xs font-bold uppercase tracking-[0.5em] rounded-full shadow-gold-glow-lg transition-all duration-700 hover:scale-[1.02] active:scale-95">
+                             Enviar Solicitud vía WhatsApp
                            </button>
                         </div>
                      </form>
