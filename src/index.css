@@ -43,6 +43,14 @@
     border: 1px solid rgba(177, 150, 95, 0.1);
   }
 
+  .shadow-3xl {
+    box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.3);
+  }
+
+  .shadow-gold-glow-lg {
+    box-shadow: 0 0 30px rgba(177, 150, 95, 0.3);
+  }
+
   .parallax-image {
     will-change: transform;
     transition: transform 0.5s cubic-bezier(0.33, 1, 0.68, 1);

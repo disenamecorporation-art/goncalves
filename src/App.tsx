@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import React, { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useScroll, useTransform, useSpring } from "motion/react";
 import { 
   Search, 
-  User, 
+  Menu,
+  X,
   ShieldCheck, 
   Sparkles, 
   Hotel, 
@@ -17,7 +18,10 @@ import {
   Mail,
   Phone,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  Gem,
+  Crown,
+  Star
 } from "lucide-react";
 
 const HERO_IMAGES = [
@@ -27,10 +31,164 @@ const HERO_IMAGES = [
   "https://i.postimg.cc/L5P9h3Jr/MG-2128.jpg"
 ];
 
+const InputField = ({ label, name, type = "text", placeholder }: { label: string, name: string, type?: string, placeholder?: string }) => (
+  <div className="space-y-3 group">
+    <label className="text-[10px] uppercase tracking-[0.3em] text-dark/40 group-focus-within:text-gold transition-colors block font-bold">
+      {label}
+    </label>
+    <input 
+      name={name}
+      type={type}
+      placeholder={placeholder}
+      required
+      className="w-full bg-transparent border-b border-gold/20 py-4 font-serif text-xl focus:outline-none focus:border-gold transition-all duration-500 placeholder:text-dark/10"
+    />
+  </div>
+);
+
+const FloatingSparkle = ({ i, springScroll }: any) => {
+  const y = useTransform(springScroll, [0, 1], [i * 100, -i * 100]);
+  const z = useTransform(springScroll, [0, 1], [i * 50, -i * 50]);
+  const opacity = useTransform(springScroll, [0, 0.5, 1], [0, 0.4, 0]);
+
+  return (
+    <motion.div
+      style={{ y, z, opacity }}
+      className="absolute text-gold/30 selection:bg-transparent"
+      initial={{ 
+        left: `${(i * 17) % 100}%`, 
+        top: `${(i * 23) % 100}%` 
+      }}
+    >
+      <Sparkles size={24 + i * 8} />
+    </motion.div>
+  );
+};
+
+const HeroDecoration = ({ springScroll }: any) => {
+  const opacity = useTransform(springScroll, [0.3, 0.5], [0, 1]);
+  const scaleX = useTransform(springScroll, [0.4, 0.6], [0, 1]);
+
+  return (
+    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-center space-y-4">
+       <motion.span 
+         style={{ opacity }}
+         className="text-gold text-[10px] uppercase tracking-[0.8em] font-bold block"
+       >
+         El Vestido de tus Sueños
+       </motion.span>
+       <motion.div 
+         style={{ scaleX }}
+         className="w-24 h-px bg-gold mx-auto" 
+       />
+    </div>
+  );
+};
+
+const ThreeDScrollSection = ({ containerRef, springScroll, rotateX, rotateY, zPosition, opacity, scale, navigateTo }: any) => {
+  const sectionOpacity = useTransform(springScroll, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
+  const sectionY = useTransform(springScroll, [0, 1], [30, -30]);
+
+  return (
+    <section 
+      ref={containerRef}
+      className="relative h-[160vh] lg:h-[140vh] bg-white overflow-hidden"
+    >
+      <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden px-6 md:px-20">
+        <div className="max-w-[1700px] w-full grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-20 items-center">
+          
+          {/* Side A: Scrolling Text */}
+          <div className="order-2 lg:order-1 relative flex flex-col justify-center text-center lg:text-left">
+             <motion.div
+               style={{ 
+                 opacity: sectionOpacity,
+                 y: sectionY
+               }}
+               className="space-y-4 lg:space-y-12"
+             >
+                <div className="space-y-1 lg:space-y-4">
+                  <span className="text-gold text-[9px] lg:text-[12px] uppercase tracking-[0.6em] font-bold block">Excelencia Nupcial</span>
+                  <h2 className="text-3xl md:text-6xl lg:text-8xl font-serif text-dark leading-[0.9] italic">
+                    Planificación <br />
+                    <span className="text-gold">Magistral</span>
+                  </h2>
+                </div>
+                <div className="w-12 lg:w-24 h-[1px] bg-gold mx-auto lg:mx-0" />
+                <p className="text-sm lg:text-2xl font-serif text-dark/70 italic leading-relaxed max-w-xl mx-auto lg:mx-0">
+                  Transformamos visiones en realidades etéreas. Con más de 40 años curando los eventos más prestigiosos del país.
+                </p>
+                <div className="flex items-center justify-center lg:justify-start space-x-6 text-gold group cursor-pointer" onClick={() => navigateTo('contact')}>
+                   <span className="text-[9px] lg:text-[11px] uppercase tracking-[0.4em] font-bold border-b border-gold/30 pb-2 group-hover:pr-4 transition-all duration-500">Inicia tu proyecto</span>
+                   <ChevronRight className="w-4 h-4 lg:w-5 lg:h-5 group-hover:translate-x-2 transition-transform duration-500" />
+                </div>
+             </motion.div>
+          </div>
+
+          {/* Side B: 3D Image */}
+          <div className="order-1 lg:order-2 flex items-center justify-center lg:justify-end">
+            <motion.div
+              style={{ 
+                perspective: "1500px",
+              }}
+              className="relative w-full aspect-[4/5] lg:aspect-[3/4] max-w-[280px] md:max-w-[450px] lg:max-w-[550px]"
+            >
+              {/* Floating Petals/Sparkles for depth */}
+              {[...Array(6)].map((_, i) => (
+                <FloatingSparkle key={i} i={i} springScroll={springScroll} />
+              ))}
+
+              <motion.div
+                style={{ 
+                  rotateX,
+                  rotateY,
+                  z: zPosition,
+                  opacity,
+                  scale,
+                  transformStyle: "preserve-3d"
+                }}
+                className="relative w-full h-full rounded-[30px] lg:rounded-[40px] overflow-hidden shadow-gold-glow-lg border border-gold/10"
+              >
+                <img 
+                  src="https://www.mivestidoblanco.com/wp-content/uploads/2022/08/vestidos-de-novia-corte-princesa.jpg" 
+                  alt="Escultura nupcial"
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-gold/30 via-transparent to-transparent" />
+              </motion.div>
+
+              <HeroDecoration springScroll={springScroll} />
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
+      {/* Light decorative elements */}
+      <div className="absolute top-1/4 -left-20 w-64 h-64 bg-gold/5 rounded-full blur-[100px]" />
+      <div className="absolute bottom-1/4 -right-20 w-64 h-64 bg-gold/5 rounded-full blur-[100px]" />
+    </section>
+  );
+};
+
 export default function App() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [view, setView] = useState('home');
   const [gallerySlide, setGallerySlide] = useState(0);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"]
+  });
+
+  const springScroll = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+
+  const rotateX = useTransform(springScroll, [0, 1], [45, -45]);
+  const rotateY = useTransform(springScroll, [0, 1], [-30, 30]);
+  const zPosition = useTransform(springScroll, [0, 0.5, 1], [-500, 0, -500]);
+  const opacity = useTransform(springScroll, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
+  const scale = useTransform(springScroll, [0, 0.5, 1], [0.8, 1.2, 0.8]);
 
   const GALLERY_PHOTOS = [
     {
@@ -86,6 +244,10 @@ export default function App() {
   ];
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [view]);
+
+  useEffect(() => {
     const timer = setInterval(() => {
       if (view === 'home') {
         setCurrentSlide((prev) => (prev + 1) % HERO_IMAGES.length);
@@ -127,34 +289,25 @@ export default function App() {
     }
   ];
 
+  const navigateTo = (newView: string) => {
+    setView(newView);
+    setIsMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+
   const handleWhatsAppSend = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const nombre = formData.get('nombre');
-    const email = formData.get('email');
-    const fecha = formData.get('fecha');
-    const ubicacion = formData.get('ubicacion');
-    const mensaje = formData.get('mensaje');
+    const nombre = formData.get('nombre')?.toString() || '';
+    const email = formData.get('email')?.toString() || '';
+    const fecha = formData.get('fecha')?.toString() || '';
+    const ubicacion = formData.get('ubicacion')?.toString() || '';
+    const mensaje = formData.get('mensaje')?.toString() || '';
     
-    const text = `Hola Decio Goncalves, me gustaría solicitar una reunión.\n\n*Nombre:* ${nombre}\n*Email:* ${email}\n*Fecha del Evento:* ${fecha}\n*Ubicación:* ${ubicacion}\n*Mensaje:* ${mensaje}`;
+    const text = `Hola Decio Goncalves, me gustaría solicitar información sobre sus servicios premium.\n\n*Nombre:* ${nombre}\n*Email:* ${email}\n*Fecha estimada:* ${fecha}\n*Ubicación:* ${ubicacion}\n*Mensaje:* ${mensaje}`;
     const encodedText = encodeURIComponent(text);
-    window.open(`https://wa.me/584125994286?text=${encodedText}`, '_blank');
+    window.location.href = `https://wa.me/584125994286?text=${encodedText}`;
   };
-
-  const InputField = ({ label, name, type = "text", placeholder }: { label: string, name: string, type?: string, placeholder?: string }) => (
-    <div className="space-y-3 group">
-      <label className="text-[10px] uppercase tracking-[0.3em] text-dark/40 group-focus-within:text-gold transition-colors block font-bold">
-        {label}
-      </label>
-      <input 
-        name={name}
-        type={type}
-        placeholder={placeholder}
-        required
-        className="w-full bg-transparent border-b border-gold/20 py-4 font-serif text-xl focus:outline-none focus:border-gold transition-all duration-500 placeholder:text-dark/10"
-      />
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-white selection:bg-gold/30">
@@ -164,13 +317,13 @@ export default function App() {
           <motion.div 
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="flex-shrink-0"
-            onClick={() => setView('home')}
+            className="flex-shrink-0 cursor-pointer"
+            onClick={() => navigateTo('home')}
           >
             <img 
               src="https://iili.io/BS041TP.png" 
               alt="Decio Goncalves Premium" 
-              className="h-24 md:h-28 lg:h-32 w-auto object-contain hover:scale-105 transition-transform duration-500 cursor-pointer"
+              className="h-16 md:h-28 lg:h-32 w-auto object-contain hover:scale-105 transition-transform duration-500 cursor-pointer"
               referrerPolicy="no-referrer"
               loading="eager"
             />
@@ -186,9 +339,9 @@ export default function App() {
               >
                 <button 
                   onClick={() => {
-                    if (item === "GALERÍA") setView('gallery');
-                    else if (item === "CONTACTO") setView('contact');
-                    else setView('home');
+                    if (item === "GALERÍA") navigateTo('gallery');
+                    else if (item === "CONTACTO") navigateTo('contact');
+                    else navigateTo('home');
                   }}
                   className={`relative group text-[11px] font-sans font-bold uppercase tracking-[0.4em] transition-colors duration-300 ${
                     (view === 'gallery' && item === "GALERÍA") || 
@@ -209,12 +362,58 @@ export default function App() {
             ))}
           </ul>
 
-          <div className="flex items-center space-x-6 text-gold">
-            <motion.button whileHover={{ scale: 1.1 }} className="p-2">
+          <div className="flex items-center space-x-4">
+            <motion.button whileHover={{ scale: 1.1 }} className="hidden md:block p-2 text-gold">
               <Search className="w-5 h-5 cursor-pointer" />
+            </motion.button>
+            <motion.button 
+              whileTap={{ scale: 0.9 }} 
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="xl:hidden p-2 text-gold"
+            >
+              {isMenuOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
             </motion.button>
           </div>
         </nav>
+
+        {/* Mobile Menu Overlay */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="xl:hidden bg-white border-b border-gold/10 overflow-hidden"
+            >
+              <ul className="px-8 py-12 space-y-8">
+                {menuItems.map((item, idx) => (
+                  <motion.li
+                    key={item}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.1 }}
+                  >
+                    <button
+                      onClick={() => {
+                        if (item === "GALERÍA") navigateTo('gallery');
+                        else if (item === "CONTACTO") navigateTo('contact');
+                        else navigateTo('home');
+                      }}
+                      className={`text-2xl font-serif tracking-[0.2em] uppercase transition-colors ${
+                        (view === 'gallery' && item === "GALERÍA") || 
+                        (view === 'contact' && item === "CONTACTO") ||
+                        (view === 'home' && item === "INICIO")
+                        ? 'text-gold' : 'text-dark'
+                      }`}
+                    >
+                      {item}
+                    </button>
+                  </motion.li>
+                ))}
+              </ul>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       <AnimatePresence mode="wait">
@@ -272,7 +471,7 @@ export default function App() {
                     className="mt-16"
                   >
                     <button 
-                      onClick={() => setView('contact')}
+                      onClick={() => navigateTo('contact')}
                       className="shine-effect px-12 py-5 bg-gold text-white text-[11px] font-bold uppercase tracking-[0.3em] rounded-full hover:bg-gold-dark transition-all duration-500 shadow-2xl"
                     >
                       Descubre la Experiencia
@@ -295,10 +494,21 @@ export default function App() {
                     <ChevronRight className="w-6 h-6" />
                   </button>
                 </div>
-              </section>
+            </section>
+
+            <ThreeDScrollSection 
+              containerRef={containerRef}
+              springScroll={springScroll}
+              rotateX={rotateX}
+              rotateY={rotateY}
+              zPosition={zPosition}
+              opacity={opacity}
+              scale={scale}
+              navigateTo={navigateTo}
+            />
 
               {/* --- GOLDEN STATEMENT BANNER --- */}
-              <section className="relative py-40 overflow-hidden bg-cream">
+              <section className="relative py-20 lg:py-32 overflow-hidden bg-cream">
                  <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
                    {[...Array(20)].map((_, i) => (
                       <div key={i} className="absolute h-[1px] bg-gold" style={{ 
@@ -347,9 +557,9 @@ export default function App() {
                     >
                       <div className="absolute -inset-4 border border-gold/30 rounded-2xl" />
                       <img 
-                        src="https://images.unsplash.com/photo-1544124499-58ec52cf3917?auto=format&fit=crop&q=80&w=1000" 
+                        src="https://i.postimg.cc/BbFStBjV/Whats-App-Image-2026-04-14-at-14-19-35.jpg" 
                         alt="Detail" 
-                        className="rounded-xl shadow-2xl grayscale hover:grayscale-0 transition-all duration-1000"
+                        className="rounded-xl shadow-2xl transition-all duration-1000"
                         referrerPolicy="no-referrer"
                       />
                     </motion.div>
@@ -454,12 +664,12 @@ export default function App() {
                              Hagamos que tu visión <br /> <span className="text-gold">cobre vida</span>
                            </h2>
                            <div className="w-20 h-[1px] bg-gold/30 mx-auto mb-12" />
-                           <motion.button 
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => setView('contact')}
-                            className="bg-dark text-white text-[12px] font-bold uppercase tracking-[0.4em] px-16 py-7 rounded-full shadow-2xl hover:bg-gold transition-all duration-700"
-                           >
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigateTo('contact')}
+                className="bg-dark text-white text-[12px] font-bold uppercase tracking-[0.4em] px-16 py-7 rounded-full shadow-2xl hover:bg-gold transition-all duration-700"
+              >
                               Contáctanos ahora
                            </motion.button>
                         </div>
@@ -582,7 +792,7 @@ export default function App() {
                    </div>
 
                    <button 
-                    onClick={() => setView('home')}
+                    onClick={() => navigateTo('home')}
                     className="flex items-center space-x-4 text-dark hover:text-gold transition-colors font-sans font-bold uppercase tracking-[0.2em] text-[11px]"
                    >
                      <span>Volver al Inicio</span>
@@ -652,7 +862,7 @@ export default function App() {
                {/* Right Side: Luxurious Form */}
                <div className="lg:w-2/3 w-full bg-white relative">
                   <div className="absolute -top-10 -right-10 w-64 h-64 bg-gold/5 rounded-full blur-3xl" />
-                  <div className="relative z-10 glass-card p-12 md:p-20 rounded-[60px] shadow-3xl ring-1 ring-gold/10">
+                  <div className="relative z-10 glass-gold p-12 md:p-20 rounded-[60px] shadow-3xl ring-1 ring-gold/10">
                      <form className="space-y-12" onSubmit={handleWhatsAppSend}>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                            <InputField name="nombre" label="Nombre Completo" placeholder="Escribe tu nombre..." />
@@ -731,8 +941,8 @@ export default function App() {
           </div>
 
           <div className="pt-16 border-t border-gold/10 flex flex-col md:flex-row items-center justify-between space-y-8 md:space-y-0 text-center md:text-left">
-            <p className="text-[10px] text-dark/30 uppercase tracking-[0.3em]">
-              &copy; 2024 • DECIO GONCALVES PREMIUM WEDDINGS • CARACAS • WORLDWIDE
+            <p className="text-[10px] text-gold uppercase tracking-[0.3em] font-bold">
+              &copy; 2024 • DECIO GONCALVES • <a href="https://instagram.com/legaint.ve" target="_blank" rel="noopener noreferrer" className="hover:underline">PAGINA WEB DESARROLLADA Y DISEÑADA POR LEGAINT CORPORATION</a>
             </p>
             <div className="flex space-x-8 text-[10px] text-dark/40 uppercase tracking-widest font-bold">
                <a href="#" className="hover:text-gold transition-colors duration-500">Legal</a>
