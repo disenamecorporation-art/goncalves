@@ -232,9 +232,9 @@ export default function App() {
       desc: "Combinamos colores y texturas para crear ambientes únicos y memorables."
     },
     {
-      url: "https://i.postimg.cc/D0GvmPS9/Whats-App-Image-2026-04-14-at-15-50-01-(1).jpg",
-      title: "Momentos Dulces",
-      desc: "La alegría compartida en el corte de la torta, rodeados de flores y luz."
+      url: "https://i.postimg.cc/3xq8n0qL/image.png",
+      title: "Destellos de Amor",
+      desc: "Cada detalle es una expresión de la belleza y la emoción que rodea el gran día."
     },
     {
       url: "https://i.postimg.cc/RhtSqL35/Whats-App-Image-2026-04-14-at-16-04-13.jpg",
